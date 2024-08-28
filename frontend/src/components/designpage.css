@@ -1,0 +1,7 @@
+.selected{
+    background-color: aqua;
+    border-radius: 20px;
+}
+li{
+    padding: 10px 10px;
+}
