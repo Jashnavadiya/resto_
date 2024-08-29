@@ -4,9 +4,11 @@ const mongoose = require('mongoose');
 // Create a new category with an empty subcategories array
 const createCategory = async (req, res) => {
     try {
+        console.log(req.body);
+        
         const category = new Category({
             name: req.body.name,
-            image: req.body.image,  // optional
+            images: req.body.images,  // optional
             subcategories: []       // Initially empty
         });
         await category.save();
@@ -86,7 +88,7 @@ const getCategoryById = async (req, res) => {
 // Update a category by ID
 const updateCategory = async (req, res) => {
     try {
-        const { _id, name, subcategories } = req.body;
+        const { _id, name, subcategories,images } = req.body;
 
         console.log('Request Body:', req.body);
 
@@ -104,6 +106,10 @@ const updateCategory = async (req, res) => {
         if (subcategories && Array.isArray(subcategories)) {
             // Assuming you want to replace the existing subcategories
             category.subcategories = subcategories;
+        }
+        if (images && Array.isArray(images)) {
+            // Assuming you want to replace the existing subcategories
+            category.images = images;
         }
         // Save the updated category
         const updatedCategory = await category.save();
@@ -148,11 +154,10 @@ const updatesubcategory = async (req, res) => {
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
 };
-
 const updateItem = async (req, res) => {
     try {
         // Extract parameters and request body data
-        const { name, description, image } = req.body;
+        const { name, description, images } = req.body; // `images` is now an array
         const categoryId = req.params.id; // Category ID
         const subcategoryId = req.params.subId; // Subcategory ID
         const itemId = req.params.itemId; // Item ID
@@ -174,7 +179,7 @@ const updateItem = async (req, res) => {
                 $set: {
                     'subcategories.$[sc].items.$[item].name': name,
                     'subcategories.$[sc].items.$[item].description': description,
-                    'subcategories.$[sc].items.$[item].image': image
+                    'subcategories.$[sc].items.$[item].images': images // Set the images field as an array
                 }
             },
             {
@@ -188,13 +193,13 @@ const updateItem = async (req, res) => {
             return res.status(404).json({ error: 'Category, Subcategory, or Item not found' });
         }
 
+        console.log('Updated Category:', category); // Log updated category
         res.status(200).json(category);
     } catch (error) {
         console.error('Update Item Error:', error); // Log error for debugging
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
 };
-
 
 // Delete a category by ID
 const deleteCategory = async (req, res) => {

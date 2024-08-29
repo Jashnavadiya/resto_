@@ -9,9 +9,15 @@ const Resto = require("./models/resto.js")
 
 connect_to_db();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// Enable CORS
+app.use(cors({
+  origin: 'http://localhost:5173' // Your frontend origin
+}));
+
+// Increase the limit for JSON payloads
+app.use(express.json({ limit: '50mb' })); // Adjust as needed
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // For URL-encoded payloads
+
 
 app.use("/api/v1/food", require("./routes/food.routes.js"));
 app.use("/api/v1/category", require("./routes/category.routes.js"));

@@ -36,7 +36,7 @@ const DesignPage = () => {
   const [itemDetails, setItemDetails] = useState({
     name: '',
     description: '',
-    images: ""
+    images: []
   });
 
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(null);
@@ -44,7 +44,7 @@ const DesignPage = () => {
   const [editingItemIndex, setEditingItemIndex] = useState(null);
 
   const handleAddCategory = () => {
-    setNewCategory('');
+    setNewCategory({name:'',images:[],subcategories:[]});
     setEditingCategoryIndex(null);
     setShowCategoryPopup(true);
   };
@@ -59,14 +59,19 @@ const DesignPage = () => {
     setItemDetails({
       name: '',
       description: '',
-      images: ""
+      images: []
     });
     setEditingItemIndex(null);
     setShowItemPopup(true);
   };
 
   const handleEditCategory = (index) => {
-    setNewCategory(categories[index]);
+    setNewCategory({
+      name:categories[index].name,
+      images:categories[index].images,
+      subcategories:categories[index].subcategories
+    });
+    
     setEditingCategoryIndex(index);
     setShowCategoryPopup(true);
   };
@@ -91,13 +96,15 @@ const DesignPage = () => {
   };
 
   const handleSaveCategory = async() => {
-    if (newCategory.trim()) {
+    if (newCategory.name.trim()) {
       if (editingCategoryIndex !== null) {
         const updatedCategories = [...categories];
-        updatedCategories[editingCategoryIndex].name = newCategory ;
+        // updatedCategories[editingCategoryIndex].name = newCategory.name ;
         let response=await axios.put(`http://localhost:5000/api/v1/category/${updatedCategories[editingCategoryIndex]._id}/updateCategory`,
-          {...updatedCategories[editingCategoryIndex],name:newCategory})
+          {...newCategory,_id:updatedCategories[editingCategoryIndex]._id})
           toast.success('category suceesfully edited');
+          console.log(response.data);
+          
           setCategories(prevCategories => {
             const updatedCategories = [...prevCategories];
             updatedCategories[editingCategoryIndex] = response.data;
@@ -105,10 +112,7 @@ const DesignPage = () => {
         });
         setEditingCategoryIndex(null);
       } else {
-        let response=await axios.post('http://localhost:5000/api/v1/category/createCategory',{
-          name: newCategory,
-          subcategory: []
-        })
+        let response=await axios.post('http://localhost:5000/api/v1/category/createCategory',newCategory)
         
         setCategories([...categories, response.data]);
         toast.success('category suceesfully added')
@@ -148,11 +152,14 @@ console.log(editingSubCategoryIndex);
           
           let response=await axios.put(`http://localhost:5000/api/v1/category/${selectedCategory._id}/subcategories/${selectedSubCategory._id}/items/${updatedItems[editingItemIndex]._id}`,itemDetails);
           let [hiiii]=[...response.data.subcategories.filter((ele)=>ele.name === selectedSubCategory.name)]
-          console.log(hiiii.items);
+          console.log(hiiii.items,response.data);
+          console.log(`http://localhost:5000/api/v1/category/${selectedCategory._id}/subcategories/${selectedSubCategory._id}/items/${updatedItems[editingItemIndex]._id}`);
+          
           
           setItems(hiiii.items);
           setEditingItemIndex(null);
         } else {
+          console.log(itemDetails);
           
           let response= await axios.post(`http://localhost:5000/api/v1/category/${selectedCategory._id}/subcategories/${selectedSubCategory._id}/createitems`,itemDetails)
           console.log(response.data);
@@ -211,7 +218,24 @@ console.log(editingSubCategoryIndex);
       setItemDetails(prev => ({ ...prev, images: urls }));
     });
   };
+  const handlecategoryImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    const imageUrls = files.map(file => {
+      const reader = new FileReader();
+      return new Promise((resolve) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(imageUrls).then(urls => {
+      setNewCategory(prev => ({ ...prev, images: urls }));
+    });
+  };
 
+  const setcategorydetails=(e)=>{
+    const {name,value}=e.target;
+    setNewCategory({...newCategory,[name]:value})
+  }
 
   useEffect(() => {
     if (selectedCategory) {
@@ -402,13 +426,30 @@ console.log(editingSubCategoryIndex);
           title={editingCategoryIndex !== null ? "Edit Category" : "Add New Category"}
           onClose={() => setShowCategoryPopup(false)}
         >
-          
+          {console.log(newCategory)
+          }
           <input
             type="text"
             placeholder="Category name"
             value={newCategory.name}
-            onChange={(e) => setNewCategory(e.target.value)}
+            name='name'
+            onChange={setcategorydetails}
           />
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handlecategoryImageUpload}
+          />
+          <div className="image-previews">
+
+
+            {newCategory.images.map((image, index) => (
+              <div key={index} className="image-preview">
+                <img src={image} alt={`Preview ${index}`} style={{ width: '100px', height: 'auto' }} />
+              </div>
+            ))}
+          </div>
           <button onClick={handleSaveCategory} className="save-btn">Save</button>
           <button onClick={() => setShowCategoryPopup(false)} className="close-btn">Close</button>
         </Popup>
@@ -435,8 +476,7 @@ console.log(editingSubCategoryIndex);
           title={editingItemIndex !== null ? "Edit Item" : "Add New Item"}
           onClose={() => setShowItemPopup(false)}
         >
-          {console.log(itemDetails)
-          }
+          
           <input
             type="text"
             placeholder="Item name"
@@ -457,11 +497,11 @@ console.log(editingSubCategoryIndex);
           <div className="image-previews">
 
 
-            {/* {itemDetails.images.map((image, index) => (
+            {itemDetails.images.map((image, index) => (
               <div key={index} className="image-preview">
                 <img src={image} alt={`Preview ${index}`} style={{ width: '100px', height: 'auto' }} />
               </div>
-            ))} */}
+            ))}
           </div>
           <button onClick={handleSaveItem} className="save-btn">Save</button>
           {/* <button onClick={() => setShowItemPopup(false)} className="close-btn">Close</button> */}

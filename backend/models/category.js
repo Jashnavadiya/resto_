@@ -10,7 +10,7 @@ const itemSchema = new mongoose.Schema({
         trim: true
     },
     images: {
-        type: String,
+        type: Array,
         trim: true
     },
 });
@@ -31,8 +31,8 @@ const categorySchema = new mongoose.Schema({
         trim: true,
         unique:true
     },
-    image:{
-        type: String,
+    images: {
+        type: Array,
         trim: true
     },
     subcategories: [subcategorySchema],
