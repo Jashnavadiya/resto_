@@ -3,15 +3,16 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './Basicinfo.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 const BasicInfoEvents = () => {
-
+    const nav = useNavigate()
     const [event, setEvent] = useState({
         name: "",
         city: "",
+        images: [],
         time: {
             date: "",
             start: "",
@@ -22,38 +23,63 @@ const BasicInfoEvents = () => {
 
 
 
-    const [date, setDate] = useState(new Date());
-    const [startTime, setStartTime] = useState(new Date());
-    const [endTime, setEndTime] = useState(new Date());
-
+    const [date, setDate] = useState(null);
+    const [startTime, setStartTime] = useState(null);
+    const [endTime, setEndTime] = useState(null);
     const [openStart, setOpenStart] = useState(false);
     const [openEnd, setOpenEnd] = useState(false);
 
-    // Function to handle start time change
     const handleStartTimeChange = (time) => {
         setStartTime(time);
+        setEvent(prevEvent => ({
+            ...prevEvent,
+            time: {
+                ...prevEvent.time,
+                start: time
+            }
+        }));
     };
 
-    // Function to handle end time change
     const handleEndTimeChange = (time) => {
         setEndTime(time);
+        setEvent(prevEvent => ({
+            ...prevEvent,
+            time: {
+                ...prevEvent.time,
+                end: time
+            }
+        }));
     };
 
+
+    const handleDateChange = (selectedDate) => {
+        setDate(selectedDate);
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            time: {
+                ...prevEvent.time,
+                date: selectedDate
+            }
+        }));
+    };
+
+
+
     // Combine date with time for start and end
-    const startDateTime = new Date(date);
-    startDateTime.setHours(startTime.getHours(), startTime.getMinutes());
+    // const startDateTime = new Date(date);
+    // startDateTime.setHours(startTime.getHours(), startTime.getMinutes());
 
-    const endDateTime = new Date(date);
-    endDateTime.setHours(endTime.getHours(), endTime.getMinutes());
-
-
-    const [files, setFiles] = useState([]);
+    // const endDateTime = new Date(date);
+    // endDateTime.setHours(endTime.getHours(), endTime.getMinutes());
 
     const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
         const newFiles = Array.from(e.dataTransfer.files);
-        setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            images: [...prevEvent.images, ...newFiles]
+        }));
     };
 
     const handleDragOver = (e) => {
@@ -63,29 +89,40 @@ const BasicInfoEvents = () => {
 
     const handleFileChange = (e) => {
         const newFiles = Array.from(e.target.files);
-        setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            images: [...prevEvent.images, ...newFiles]
+        }));
     };
 
     const removeFile = (index) => {
-        setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            images: prevEvent.images.filter((_, i) => i !== index)
+        }));
     };
 
     const handleInputchange = (e) => {
-        const {name, value} = e.target;
-        setEvent({...event, [name]: value });
+        const { name, value } = e.target;
+        setEvent({ ...event, [name]: value });
     }
 
-    useEffect(()=>{
-        console.log('hi');
-        
-    },[event])
+
+    const handleSubmit = (e) => {
+        nav("../ticket")
+    }
+
+    useEffect(() => {
+        console.log(event);
+
+    }, [event])
     return (
         <>
             <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>
-                <div className='w-11/12 m-auto h-fit p-5' style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px", borderRadius: "7px", backgroundColor: "white" }}>
+                <div className='w-11/12 m-auto h-fit mt-7 p-5' style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px", borderRadius: "7px", backgroundColor: "white" }}>
                     <h2>
                         <div className="flex align-middle justify-center">
-                            <div className="basic-info" style={{color:"#FE724C"}}>Basic-Info</div>
+                            <div className="basic-info" style={{ color: "#FE724C" }}>Basic-Info</div>
                             <div className="line orange"></div>
                             <div className="tickets">Tickets</div>
                             <div className="line"></div>
@@ -108,7 +145,7 @@ const BasicInfoEvents = () => {
                                 onDrop={handleDrop}
                                 onDragOver={handleDragOver}
                             >
-                                <img src="../../../public/upload.png" alt="Upload" />
+                                <img src="../../../upload.png" alt="Upload" />
                                 <p>Drag and Drop Here</p>
                                 <p className='text-gray-500 font-normal'>Or</p>
                                 <input
@@ -122,7 +159,7 @@ const BasicInfoEvents = () => {
                                     Browse Files
                                 </label>
                                 <div className="file-list">
-                                    {files.map((file, index) => (
+                                    {event.images.map((file, index) => (
                                         <div key={index} className="file-item">
                                             {file.name}
                                             <button
@@ -136,6 +173,7 @@ const BasicInfoEvents = () => {
                                     ))}
                                 </div>
                             </div>
+
                         </div>
                         <label className="form-control w-full mt-3">
                             <div className="label">
@@ -153,30 +191,38 @@ const BasicInfoEvents = () => {
 
                         <div className='flex w-1/2 mt-3'>
 
-                            <label className="form-control w-full ">
-                                {/* Date Picker */}
+                            <label className="form-control w-full">
                                 <div style={{ marginBottom: '15px' }}>
                                     <div className="label">
                                         <span className="label-text">Event Date</span>
                                     </div>
                                     <DatePicker
                                         selected={date}
-                                        onChange={(date) => setDate(date)}
+                                        onChange={(date) => {
+                                            setDate(date);
+                                            setEvent(prevEvent => ({
+                                                ...prevEvent,
+                                                time: {
+                                                    ...prevEvent.time,
+                                                    date
+                                                }
+                                            }));
+                                        }}
                                         dateFormat="dd/MM/yyyy"
+                                        minDate={new Date()}
                                         customInput={
                                             <button
                                                 type="button"
                                                 style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', padding: '5px 30px ', borderRadius: '4px', cursor: 'pointer' }}
                                             >
                                                 <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: '8px' }} />
-                                                {date.toLocaleDateString('en-GB')}
+                                                {date ? date.toLocaleDateString('en-GB') : 'Select Date'}
                                             </button>
                                         }
                                     />
                                 </div>
                             </label>
-                            <label className="form-control w-full ">
-                                {/* Start Time Picker */}
+                            <label className="form-control w-full">
                                 <div style={{ marginBottom: '15px' }}>
                                     <div className="label">
                                         <span className="label-text">Event Start Time</span>
@@ -189,6 +235,8 @@ const BasicInfoEvents = () => {
                                         timeFormat="HH:mm"
                                         timeIntervals={15}
                                         dateFormat="HH:mm"
+                                        minTime={date && new Date() > date ? new Date() : new Date().setHours(0, 0)}
+                                        maxTime={new Date().setHours(23, 59)}
                                         open={openStart}
                                         onClickOutside={() => setOpenStart(false)}
                                         onCalendarClose={() => setOpenStart(false)}
@@ -199,15 +247,13 @@ const BasicInfoEvents = () => {
                                                 onClick={() => setOpenStart(!openStart)}
                                                 style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', padding: '5px 30px ', borderRadius: '4px', cursor: 'pointer' }}
                                             >
-
-                                                {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {startTime ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select Start Time'}
                                             </button>
                                         }
                                     />
                                 </div>
                             </label>
-                            <label className="form-control w-full ">
-                                {/* End Time Picker */}
+                            <label className="form-control w-full">
                                 <div>
                                     <div className="label">
                                         <span className="label-text">Event Ending Time</span>
@@ -220,6 +266,8 @@ const BasicInfoEvents = () => {
                                         timeFormat="HH:mm"
                                         timeIntervals={15}
                                         dateFormat="HH:mm"
+                                        minTime={startTime ? startTime : new Date().setHours(0, 0)}
+                                        maxTime={new Date().setHours(23, 59)}
                                         open={openEnd}
                                         onClickOutside={() => setOpenEnd(false)}
                                         onCalendarClose={() => setOpenEnd(false)}
@@ -230,8 +278,7 @@ const BasicInfoEvents = () => {
                                                 onClick={() => setOpenEnd(!openEnd)}
                                                 style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', padding: '5px 30px ', borderRadius: '4px', cursor: 'pointer' }}
                                             >
-
-                                                {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {endTime ? endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select End Time'}
                                             </button>
                                         }
                                     />
@@ -248,8 +295,8 @@ const BasicInfoEvents = () => {
 
                     </div>
                 </div>
-               <Link className='w-fit m-auto my-5' to="/ticket" > <button className='m-auto w-full px-5 py-2'  style={{backgroundColor:"#FE724C",color:"white"}}>Next</button></Link>
-               
+                <button className='m-auto w-fit px-5 py-2 my-5' onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
+
             </div>
         </>
     )

@@ -3,11 +3,11 @@ import React from 'react';
 
 const Popup = ({ title, children, onClose }) => {
   return (
-    <div className="popup-overlay">
-      <div className="popup-content">
+    <div className="popup-overlay ">
+      <div className="popup-content w-1/3">
         <h2>{title}</h2>
         {children}
-        <button onClick={onClose} className="close-btn">Close</button>
+        
       </div>
     </div>
   );
