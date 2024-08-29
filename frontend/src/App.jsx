@@ -8,6 +8,7 @@ import DesignPage from './components/DesignPage ';
 
 import './App.css';
 import My_File from './components/My_File';
+import MainEvent from './pages/events/MainEvent';
 
 const App = () => {
   
@@ -45,6 +46,8 @@ const App = () => {
       <BrowserRouter>
           <Routes>
             <Route path="/design" element={<DesignPage />} />
+            <Route path="/events/*" element={<MainEvent />} />
+            
             <Route path="/file" element={<My_File />} />
           </Routes>
         </BrowserRouter>
