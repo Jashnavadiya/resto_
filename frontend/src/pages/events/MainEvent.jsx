@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import HomeEvent from './HomeEvent'
 import BasicInfoEvents from './BasicInfoEvents'
+import Tickets from './Tickets'
 
 const MainEvent = () => {
   return (
@@ -11,6 +12,7 @@ const MainEvent = () => {
       <Routes>
         <Route path='/' element={<HomeEvent/>}/>
         <Route path='/basicinfo' element={<BasicInfoEvents/>}/>
+        <Route path='/ticket' element={<Tickets/>}/>
             
       </Routes>
     </div>

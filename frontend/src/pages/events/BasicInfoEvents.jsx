@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './Basicinfo.css'
+import { Link } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
@@ -69,14 +70,22 @@ const BasicInfoEvents = () => {
         setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     };
 
+    const handleInputchange = (e) => {
+        const {name, value} = e.target;
+        setEvent({...event, [name]: value });
+    }
 
+    useEffect(()=>{
+        console.log('hi');
+        
+    },[event])
     return (
         <>
             <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>
                 <div className='w-11/12 m-auto h-fit p-5' style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px", borderRadius: "7px", backgroundColor: "white" }}>
                     <h2>
                         <div className="flex align-middle justify-center">
-                            <div className="basic-info">Basic-Info</div>
+                            <div className="basic-info" style={{color:"#FE724C"}}>Basic-Info</div>
                             <div className="line orange"></div>
                             <div className="tickets">Tickets</div>
                             <div className="line"></div>
@@ -132,14 +141,14 @@ const BasicInfoEvents = () => {
                             <div className="label">
                                 <span className="label-text">Event Name</span>
                             </div>
-                            <input type="text" placeholder="Enter Event Name" className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
+                            <input type="text" placeholder="Enter Event Name" value={event.name} onChange={handleInputchange} name='name' className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
                         </label>
                         <label className="form-control w-full mt-3">
                             <div className="label">
                                 <span className="label-text">Event City</span>
                             </div>
 
-                            <input type="text" placeholder="Enter Event Place" className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
+                            <input type="text" placeholder="Enter Event Place" value={event.city} onChange={handleInputchange} name='city' className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
                         </label>
 
                         <div className='flex w-1/2 mt-3'>
@@ -234,10 +243,13 @@ const BasicInfoEvents = () => {
                             <div className="label">
                                 <span className="label-text">Event price</span>
                             </div>
-                            <input type="text" placeholder="Enter Event Name" className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
+                            <input type="text" placeholder="Enter Event Name" name='price' value={event.price} onChange={handleInputchange} className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
                         </label>
+
                     </div>
                 </div>
+               <Link className='w-fit m-auto my-5' to="/ticket" > <button className='m-auto w-full px-5 py-2'  style={{backgroundColor:"#FE724C",color:"white"}}>Next</button></Link>
+               
             </div>
         </>
     )

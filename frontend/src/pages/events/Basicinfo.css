@@ -24,13 +24,13 @@
 
   .line {
     height: 1px;
-    width: 20%;
+    width: 22%;
     margin: auto;
     background-color: lightgray;
   }
 
   .line.orange {
-    background-color: orange;
+    background-color: #FE724C;
     position: relative;
   }
   .orange::after{
@@ -41,7 +41,7 @@
     left: 0;
     width: 8px;
     height: 8px;
-    background-color: orange;
+    background-color: #FE724C;
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
   }
