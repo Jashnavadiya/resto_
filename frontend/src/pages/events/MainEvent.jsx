@@ -5,13 +5,16 @@ import BasicInfoEvents from './BasicInfoEvents'
 
 const MainEvent = () => {
   return (
-    <div>
+   <div className='flex'>
+    <div className='w-2/12 bg-black h-screen'>q</div>
+    <div className='w-10/12'>
       <Routes>
         <Route path='/' element={<HomeEvent/>}/>
         <Route path='/basicinfo' element={<BasicInfoEvents/>}/>
             
       </Routes>
     </div>
+   </div>
   )
 }
 
