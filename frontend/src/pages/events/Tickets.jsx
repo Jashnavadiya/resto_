@@ -1,31 +1,113 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './tickets.css'
-import {Link} from 'react-router-dom'
+import { Link ,useNavigate} from 'react-router-dom'
 import Popup from '../../components/Popup';
 
 const Tickets = () => {
-  const [ticketpopup, setTicketPopup] = useState(false);
-  const [ticket,setTicket]=useState({
-    name:"",
-    type:"",
-    available:"",
-    description:''
-  })
-  
-  const [savedTicket,setsavedTicket]=useState(false)
+  const nav=useNavigate()
 
-  const handleInputchange=(e)=>{
-    const {name,value}=e.target;
-    setTicket({...ticket,[name]:value})
+
+  const [ticketpopup, setTicketPopup] = useState(false);
+  const [ticket, setTicket] = useState({
+    name: "",
+    type: "",
+    available: "",
+    description: ''
+  })
+  const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
+    name: "",
+    city: "",
+    images: [],
+    time: {
+        date: "",
+        start: "",
+        end: ""
+    },
+    price: '',
+    tickets: {
+        name: "",
+        type: "",
+        available: "",
+        description: ''
+    },
+    info: {
+        desc: '',
+        terms: ''
+    }
+});
+
+useEffect(() => {
+    // Attempt to get and parse the event from localStorage
+    const storedEvent = localStorage.getItem('event');
     
+    // Only update state if storedEvent is not null
+    if (storedEvent) {
+        try {
+            const parsedEvent = JSON.parse(storedEvent);
+            setEvent(parsedEvent);
+        } catch (error) {
+            console.error("Error parsing event data from localStorage:", error);
+            // Optionally reset to default state if parsing fails
+            setEvent({
+                name: "",
+                city: "",
+                images: [],
+                time: {
+                    date: "",
+                    start: "",
+                    end: ""
+                },
+                price: '',
+                tickets: {
+                    name: "",
+                    type: "",
+                    available: "",
+                    description: ''
+                },
+                info: {
+                    desc: '',
+                    terms: ''
+                }
+            });
+        }
+    }
+}, []);
+
+
+  const [savedTicket, setsavedTicket] = useState(false)
+
+  const handleInputchange = (e) => {
+    const { name, value } = e.target;
+    setTicket({ ...ticket, [name]: value })
+
   }
 
-  const handleSaveTicketInfo=()=>{
+  const handleSaveTicketInfo = () => {
     // save ticket info to your database
     console.log(ticket);
+    setEvent({ ...event, tickets: ticket })
+    console.log(event);
+
     setsavedTicket(true)
     setTicketPopup(false);
   }
+
+  const handleSubmit = (e) => {
+    const {name}=e.target
+    if(name=='next'){
+      nav('../description')
+      
+    }else if(name=='prev'){
+      nav('../basicinfo')
+    }
+  }
+  useEffect(()=>{
+    localStorage.setItem('event',JSON.stringify(event))
+    if(event.tickets!==ticket){
+      setTicket(event.tickets)
+      setsavedTicket(true)
+    }
+  },[event])
 
   return (
     <>
@@ -43,14 +125,19 @@ const Tickets = () => {
             </div>
           </h2>
           <div className='flex justify-center align-middle' style={{ height: "78vh" }}>
-            <div className={`w-1/3 text-center ${savedTicket?"bg-green-100":""} flex-col h-fit m-auto py-10 justify-center align-middle`} style={{ border: `1px solid ${savedTicket?"green":"orange"}`, borderRadius: "15px" }}>
-              <img src={savedTicket?"../../../green_ticket.png":"../../../red_ticket.png"} className='m-auto mb-5' alt="" />
-              <button className='addticketbtn outline-none ' style={{ border: `1px solid ${savedTicket?"green":"orange"}`}} onClick={() => setTicketPopup(true)}>+ Add tickets for your events</button>
+            <div className={`w-1/3 text-center ${savedTicket ? "bg-green-100" : ""} flex-col h-fit m-auto py-10 justify-center align-middle`} style={{ border: `1px solid ${savedTicket ? "green" : "orange"}`, borderRadius: "15px" }}>
+              <h1 className='flex w-11/12 justify-end bg-transparent text-lg m-auto'>{savedTicket ? <i class="fa-regular fa-pen-to-square cursor-pointer" onClick={() => setTicketPopup(true)}></i> : ""}</h1>
+              <img src={savedTicket ? "../../../green_ticket.png" : "../../../red_ticket.png"} className='m-auto mb-5' alt="" />
+              <button className='addticketbtn outline-none ' style={{ border: `1px solid ${savedTicket ? "green" : "orange"}` }} onClick={() => setTicketPopup(true)}>{savedTicket ? "Tickets Added !" : "+ Add tickets for your events"}</button>
             </div>
 
           </div>
         </div>
-        <button className='m-auto w-fit px-5 py-2' style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
+        <div className='text-center my-6'>
+        <button className='m-auto w-fit mx-5 px-5 py-2' name='prev'  onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Previous</button>
+        <button className='m-auto w-fit mx-5 px-5 py-2' name='next'  onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
+        </div>
+        
         {ticketpopup &&
           <Popup title=""
             onClose={() => setTicketPopup(false)}>
@@ -80,9 +167,10 @@ const Tickets = () => {
                 </div>
                 <input type="text" placeholder="Enter Event Name" value={ticket.description} onChange={handleInputchange} name='description' className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
               </label>
-             <div className='flex pt-3'> 
-             <button className='m-auto w-fit px-5 py-2' onClick={handleSaveTicketInfo} style={{ backgroundColor: "#FE724C", color: "white" }}>Save</button>
-             </div>
+              <div className='flex pt-3'>
+                
+                <button className='m-auto w-fit px-5 py-2' onClick={handleSaveTicketInfo} style={{ backgroundColor: "#FE724C", color: "white" }}>Save</button>
+              </div>
             </div>
           </Popup>
 

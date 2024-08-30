@@ -7,9 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+
 const BasicInfoEvents = () => {
     const nav = useNavigate()
-    const [event, setEvent] = useState({
+    const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
         name: "",
         city: "",
         images: [],
@@ -18,8 +19,19 @@ const BasicInfoEvents = () => {
             start: "",
             end: ""
         },
-        price: ''
-    })
+        price: '',
+        tickets: {
+            name: "",
+            type: "",
+            available: "",
+            description: ''
+        },
+        info: {
+            desc: '',
+            terms: ''
+        }
+    });
+
 
 
 
@@ -89,10 +101,24 @@ const BasicInfoEvents = () => {
 
     const handleFileChange = (e) => {
         const newFiles = Array.from(e.target.files);
-        setEvent((prevEvent) => ({
-            ...prevEvent,
-            images: [...prevEvent.images, ...newFiles]
-        }));
+
+        // Helper function to convert file to base64
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Convert all new files to base64
+        Promise.all(newFiles.map(fileToBase64)).then(base64Files => {
+            setEvent((prevEvent) => ({
+                ...prevEvent,
+                images: [...prevEvent.images, ...base64Files]
+            }));
+        });
     };
 
     const removeFile = (index) => {
@@ -113,8 +139,10 @@ const BasicInfoEvents = () => {
     }
 
     useEffect(() => {
+        localStorage.setItem('event',JSON.stringify(event))
         console.log(event);
-
+      console.log(localStorage.getItem('event'));
+      
     }, [event])
     return (
         <>
@@ -161,7 +189,11 @@ const BasicInfoEvents = () => {
                                 <div className="file-list">
                                     {event.images.map((file, index) => (
                                         <div key={index} className="file-item">
-                                            {file.name}
+                                            {file.startsWith('data:image') ? (
+                                                <img src={file} alt={`Preview ${index}`} className="preview-image" />
+                                            ) : (
+                                                file.name
+                                            )}
                                             <button
                                                 className="remove-file-btn"
                                                 onClick={() => removeFile(index)}

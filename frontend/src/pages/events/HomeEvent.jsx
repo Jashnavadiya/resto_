@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const HomeEvent = () => {
 
@@ -89,13 +90,16 @@ const HomeEvent = () => {
         },
 
     ]);
-
+    const nav=useNavigate()
+    const handleNewEvent=()=>{
+        nav('../basicinfo')
+    }
 
     return (
         <>
             <div>
                 <h3 className=' w-11/12 m-auto'>
-                    <span> Manage Events</span> <button>+ Create new Event</button>
+                    <span> Manage Events</span> <button onClick={handleNewEvent}>+ Create new Event</button>
                 </h3>
                 <div className='grid grid-cols-4 w-11/12 m-auto gap-4'>
                     {events.map((ele) => {
