@@ -1,0 +1,9 @@
+.event_img{
+position: relative;
+}
+.dots-img{
+position: absolute;
+top: 0;
+right: 10px;
+background-color: transparent;
+}

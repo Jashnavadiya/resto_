@@ -21,6 +21,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true })); // For URL-encod
 
 app.use("/api/v1/food", require("./routes/food.routes.js"));
 app.use("/api/v1/category", require("./routes/category.routes.js"));
+app.use("/api/v1/event", require("./routes/events.routes.js"));
 
 
 

@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-
+import axios from 'axios'
 const BasicInfoEvents = () => {
     const nav = useNavigate()
     const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
@@ -29,9 +29,10 @@ const BasicInfoEvents = () => {
         info: {
             desc: '',
             terms: ''
-        }
+        },
+        status:false
     });
-
+    const [editingEvent,setEditingevent]=useState(false)
 
 
 
@@ -134,7 +135,18 @@ const BasicInfoEvents = () => {
     }
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
+        if(editingEvent){
+            let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+        localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+        console.log(response.data.data);
+        }else{
+            console.log(event);
+            
+            let response=await axios.post(`http://localhost:5000/api/v1/event/add`,event)
+        localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+        console.log(response.data.data);
+        }
         nav("../ticket")
     }
 
@@ -144,6 +156,15 @@ const BasicInfoEvents = () => {
       console.log(localStorage.getItem('event'));
       
     }, [event])
+    useEffect(()=>{
+        console.log(event._id!==undefined);
+        console.log(event._id);
+        
+        if(event._id!==undefined){
+            setEditingevent(true)
+            
+        }
+    },[])
     return (
         <>
             <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>

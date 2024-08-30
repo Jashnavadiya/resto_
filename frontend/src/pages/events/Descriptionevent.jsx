@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
+import axios from 'axios'
 const Descriptionevent = () => {
     const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
         name: "",
@@ -21,7 +21,8 @@ const Descriptionevent = () => {
         info: {
             desc: '',
             terms: ''
-        }
+        },
+        status:false
     });
     const [info,setInfo]=useState({
         desc:'',
@@ -47,22 +48,29 @@ const Descriptionevent = () => {
         setInfo({...info,[name]:value})
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         const { name } = e.target;
         if (name === 'next') {
             nav('../review');
         } else if (name === 'prev') {
             nav('../ticket');
         }
+        let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+        localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+        console.log(response.data.data);
     };
-
+    
     useEffect(()=>{
         setEvent({...event,info})
     },[info])
     useEffect(()=>{
         console.log(event);
         localStorage.setItem('event',JSON.stringify(event))
+        
     },[event])
+    useEffect(()=>{
+        setInfo(event.info)
+    },[])
     return (
         <>
             <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>

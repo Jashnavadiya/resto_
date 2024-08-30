@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -24,18 +25,30 @@ const Revviewevent = () => {
         info: {
             desc: '',
             terms: ''
-        }
+        },
+        status:false
     });
     const nav = useNavigate();
 
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         const { name } = e.target;
-        if (name === 'next') {
-            nav('../description');
+
+
+        if (name === 'live') {
+          
+            setEvent({...event,status:true})
+            console.log(event);
+            
+            
+
+            
         } else if (name === 'prev') {
-            nav('../ticket');
+            let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+            localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+            console.log(response.data.data);
+            nav('../description');
         }
     };
     const [date, setDate] = useState(new Date());
@@ -44,8 +57,23 @@ const Revviewevent = () => {
     const [openStart, setOpenStart] = useState(false);
     const [openEnd, setOpenEnd] = useState(false);
 
+    const [events,setevents]=useState(JSON.parse(localStorage.getItem('events'))||[])
 
-
+    useEffect(()=>{
+        setevents([...events,event]);
+        const hi=async()=>{
+            if(event.status){
+                let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+                localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+                console.log(response.data.data);
+                localStorage.setItem('events',JSON.stringify(events))
+                localStorage.setItem('event',JSON.stringify(''))
+                nav('../')
+            }
+        }
+        hi()
+    },[event])
+   
     return (
         <>
             <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>
@@ -310,11 +338,11 @@ const Revviewevent = () => {
                     </button>
                     <button
                         className='m-auto w-fit mx-5 px-5 py-2'
-                        name='next'
+                        name='live'
                         onClick={handleSubmit}
                         style={{ backgroundColor: "#FE724C", color: "white" }}
                     >
-                        Next
+                        Make It Live
                     </button>
                 </div>
             </div>

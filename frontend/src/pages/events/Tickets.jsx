@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './tickets.css'
+import axios from 'axios'
 import { Link ,useNavigate} from 'react-router-dom'
 import Popup from '../../components/Popup';
 
@@ -25,53 +26,18 @@ const Tickets = () => {
     },
     price: '',
     tickets: {
-        name: "",
-        type: "",
-        available: "",
+        name: '',
+        type: '',
+        available: '',
         description: ''
     },
     info: {
         desc: '',
         terms: ''
-    }
+    },
+    status:false
 });
 
-useEffect(() => {
-    // Attempt to get and parse the event from localStorage
-    const storedEvent = localStorage.getItem('event');
-    
-    // Only update state if storedEvent is not null
-    if (storedEvent) {
-        try {
-            const parsedEvent = JSON.parse(storedEvent);
-            setEvent(parsedEvent);
-        } catch (error) {
-            console.error("Error parsing event data from localStorage:", error);
-            // Optionally reset to default state if parsing fails
-            setEvent({
-                name: "",
-                city: "",
-                images: [],
-                time: {
-                    date: "",
-                    start: "",
-                    end: ""
-                },
-                price: '',
-                tickets: {
-                    name: "",
-                    type: "",
-                    available: "",
-                    description: ''
-                },
-                info: {
-                    desc: '',
-                    terms: ''
-                }
-            });
-        }
-    }
-}, []);
 
 
   const [savedTicket, setsavedTicket] = useState(false)
@@ -92,7 +58,7 @@ useEffect(() => {
     setTicketPopup(false);
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     const {name}=e.target
     if(name=='next'){
       nav('../description')
@@ -100,20 +66,28 @@ useEffect(() => {
     }else if(name=='prev'){
       nav('../basicinfo')
     }
+    let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+    localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+    console.log(response.data.data);
   }
   useEffect(()=>{
     localStorage.setItem('event',JSON.stringify(event))
-    if(event.tickets!==ticket){
+
+    if(event.tickets.name!==''&&event.tickets.type!==''&&event.tickets.available!==''&&event.tickets.description!==''){
       setTicket(event.tickets)
       setsavedTicket(true)
     }
   },[event])
 
+  useEffect(()=>{
+    console.log(event);
+    
+  },[ticket])
   return (
     <>
       <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>
         <div className='w-11/12 m-auto h-fit p-5 mt-5' style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px", borderRadius: "7px", backgroundColor: "white" }}>
-          <h2>
+          <h2> 
             <div className="flex align-middle justify-center">
               <div className="basic-info" ><Link to="../basicinfo" style={{ color: "#FE724C" }}>Basic-Info</Link></div>
               <div className="line orange"></div>
