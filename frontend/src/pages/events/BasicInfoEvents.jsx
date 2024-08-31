@@ -43,38 +43,42 @@ const BasicInfoEvents = () => {
     const [openEnd, setOpenEnd] = useState(false);
 
     const handleStartTimeChange = (time) => {
+        const formattedTime = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
         setStartTime(time);
         setEvent(prevEvent => ({
             ...prevEvent,
             time: {
                 ...prevEvent.time,
-                start: time
+                start: formattedTime
             }
         }));
     };
-
+    
     const handleEndTimeChange = (time) => {
+        const formattedTime = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
         setEndTime(time);
         setEvent(prevEvent => ({
             ...prevEvent,
             time: {
                 ...prevEvent.time,
-                end: time
+                end: formattedTime
             }
         }));
     };
 
 
     const handleDateChange = (selectedDate) => {
+        const formattedDate = selectedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         setDate(selectedDate);
         setEvent((prevEvent) => ({
             ...prevEvent,
             time: {
                 ...prevEvent.time,
-                date: selectedDate
+                date: formattedDate
             }
         }));
     };
+    
 
 
 

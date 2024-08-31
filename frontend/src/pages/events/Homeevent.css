@@ -7,3 +7,15 @@ top: 0;
 right: 10px;
 background-color: transparent;
 }
+.btn_create{
+    border-radius: 0;
+    color: white;
+    padding: 5px 10px;
+    font-size: 22px;
+  border: none;
+    outline: none;
+}
+.btn_create:hover,.btn_create:focus{
+    border: none;
+    outline: none;
+}
