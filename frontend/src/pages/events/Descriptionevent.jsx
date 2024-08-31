@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'
+import toast from 'react-hot-toast';
 const Descriptionevent = () => {
     const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
         name: "",
@@ -50,14 +51,20 @@ const Descriptionevent = () => {
 
     const handleSubmit = async(e) => {
         const { name } = e.target;
-        if (name === 'next') {
-            nav('../review');
-        } else if (name === 'prev') {
+        if (name === 'prev') {
             nav('../ticket');
         }
-        let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
-        localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
-        console.log(response.data.data);
+        if(event.info.desc!==''&&event.info.terms!==''){
+            if (name === 'next') {
+                nav('../review');
+            }
+            let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
+            localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
+            console.log(response.data.data);
+        }
+        else{
+            toast.error("Fill All The Fields")
+        }
     };
     
     useEffect(()=>{

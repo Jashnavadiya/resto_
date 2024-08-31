@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import Popup from '../../components/Popup';
 const Revviewevent = () => {
     const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
         name: "",
@@ -30,6 +31,10 @@ const Revviewevent = () => {
     });
     const nav = useNavigate();
 
+    const [isDone,setIsDone]=useState(false);
+
+
+
 
 
     const handleSubmit = async(e) => {
@@ -38,8 +43,8 @@ const Revviewevent = () => {
 
         if (name === 'live') {
           
-            setEvent({...event,status:true})
-            console.log(event);
+            handleFinalpopup()
+           
             
             
 
@@ -58,6 +63,14 @@ const Revviewevent = () => {
     const [openEnd, setOpenEnd] = useState(false);
 
     const [events,setevents]=useState(JSON.parse(localStorage.getItem('events'))||[])
+
+    const handleFinalpopup=(e)=>{
+        setIsDone(true)
+    }
+    const handleDone=()=>{
+        setEvent({...event,status:true})
+        console.log(event);
+    }
 
     useEffect(()=>{
         setevents([...events,event]);
@@ -345,6 +358,16 @@ const Revviewevent = () => {
                         Make It Live
                     </button>
                 </div>
+                {isDone?<Popup
+                title=""
+                onClose={() => setIsDone(false)}
+                >
+                    <h3>Are You Sure You Want To Live It?</h3>
+                    <div className='flex w-full mt-7'>
+                <button onClick={()=>{handleDone();setIsDone(false)}} className="bg-[#FE724C] w-full mx-3">Live It</button>
+                <button onClick={() => setIsDone(false)} className="bg-gray-300 w-full mx-3">Close</button>
+              </div>
+                </Popup>:""}
             </div>
         </>
     )

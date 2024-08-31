@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import './tickets.css'
 import axios from 'axios'
-import { Link ,useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Popup from '../../components/Popup';
+import toast from 'react-hot-toast';
 
 const Tickets = () => {
-  const nav=useNavigate()
+  const nav = useNavigate()
 
 
   const [ticketpopup, setTicketPopup] = useState(false);
@@ -15,28 +16,28 @@ const Tickets = () => {
     available: "",
     description: ''
   })
-  const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
+  const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event')) || {
     name: "",
     city: "",
     images: [],
     time: {
-        date: "",
-        start: "",
-        end: ""
+      date: "",
+      start: "",
+      end: ""
     },
     price: '',
     tickets: {
-        name: '',
-        type: '',
-        available: '',
-        description: ''
+      name: '',
+      type: '',
+      available: '',
+      description: ''
     },
     info: {
-        desc: '',
-        terms: ''
+      desc: '',
+      terms: ''
     },
-    status:false
-});
+    status: false
+  });
 
 
 
@@ -58,36 +59,42 @@ const Tickets = () => {
     setTicketPopup(false);
   }
 
-  const handleSubmit = async(e) => {
-    const {name}=e.target
-    if(name=='next'){
-      nav('../description')
-      
-    }else if(name=='prev'){
+  const handleSubmit = async (e) => {
+    const { name } = e.target
+    if (name == 'prev') {
       nav('../basicinfo')
     }
-    let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
-    localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
-    console.log(response.data.data);
+    if (event.tickets.name !== '' && event.tickets.available !== '' && event.tickets.description !== '' && event.tickets.type !== '') {
+      if (name == 'next') {
+        nav('../description')
+  
+      }
+      let response = await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`, event)
+      localStorage.setItem('event', JSON.stringify({ ...event, ...response.data.data }))
+      console.log(response.data.data);
+    }
+    else{
+      toast.error("Fill All The Field")
+    }
   }
-  useEffect(()=>{
-    localStorage.setItem('event',JSON.stringify(event))
+  useEffect(() => {
+    localStorage.setItem('event', JSON.stringify(event))
 
-    if(event.tickets.name!==''&&event.tickets.type!==''&&event.tickets.available!==''&&event.tickets.description!==''){
+    if (event.tickets.name !== '' && event.tickets.type !== '' && event.tickets.available !== '' && event.tickets.description !== '') {
       setTicket(event.tickets)
       setsavedTicket(true)
     }
-  },[event])
+  }, [event])
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(event);
-    
-  },[ticket])
+
+  }, [ticket])
   return (
     <>
       <div className='flex-col h-full justify-center' style={{ backgroundColor: "#FAFAFB", display: 'flex' }}>
         <div className='w-11/12 m-auto h-fit p-5 mt-5' style={{ boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px", borderRadius: "7px", backgroundColor: "white" }}>
-          <h2> 
+          <h2>
             <div className="flex align-middle justify-center">
               <div className="basic-info" ><Link to="../basicinfo" style={{ color: "#FE724C" }}>Basic-Info</Link></div>
               <div className="line orange"></div>
@@ -108,10 +115,10 @@ const Tickets = () => {
           </div>
         </div>
         <div className='text-center my-6'>
-        <button className='m-auto w-fit mx-5 px-5 py-2' name='prev'  onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Previous</button>
-        <button className='m-auto w-fit mx-5 px-5 py-2' name='next'  onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
+          <button className='m-auto w-fit mx-5 px-5 py-2' name='prev' onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Previous</button>
+          <button className='m-auto w-fit mx-5 px-5 py-2' name='next' onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
         </div>
-        
+
         {ticketpopup &&
           <Popup title=""
             onClose={() => setTicketPopup(false)}>
@@ -142,7 +149,7 @@ const Tickets = () => {
                 <input type="text" placeholder="Enter Event Name" value={ticket.description} onChange={handleInputchange} name='description' className="input input-bordered w-full max-w-lg" style={{ margin: 0 }} />
               </label>
               <div className='flex pt-3'>
-                
+
                 <button className='m-auto w-fit px-5 py-2' onClick={handleSaveTicketInfo} style={{ backgroundColor: "#FE724C", color: "white" }}>Save</button>
               </div>
             </div>

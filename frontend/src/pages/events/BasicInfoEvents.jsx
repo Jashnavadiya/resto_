@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios'
+import toast from 'react-hot-toast';
 const BasicInfoEvents = () => {
     const nav = useNavigate()
     const [event, setEvent] = useState(JSON.parse(localStorage.getItem('event'))||{
@@ -143,9 +144,10 @@ const BasicInfoEvents = () => {
     }
 
     const handleSubmit = async(e) => {
-
-
-        if(editingEvent){
+        console.log(event.images);
+        
+        if(event.name!==""&&event.images.length>0&&event.city!==""&&event.time.date!==""&&event.time.start!==""&&event.time.end!==""&&event.price!==""){
+            if(editingEvent){
             let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
         localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
         console.log(response.data.data);
@@ -157,6 +159,10 @@ const BasicInfoEvents = () => {
         console.log(response.data.data);
         }
         nav("../ticket")
+        }
+        else{
+            toast.error("Fill All The Field")
+        }
     }
 
     useEffect(() => {

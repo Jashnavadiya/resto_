@@ -51,7 +51,7 @@ const HomeEvent = () => {
     }
     const handletap = (id,tap) => {
         let [hi] = events.filter((ele) => ele._id === id);
-        hi.status = !hi.status;
+        hi.status = false;
         localStorage.setItem('event', JSON.stringify(hi));
         nav('../basicinfo')
     }
@@ -82,11 +82,11 @@ const HomeEvent = () => {
                     {events ? events.map((ele, i) => (
                         <div
                             key={i}
-                            className="bg-white rounded-lg shadow-md"
+                            className="bg-white rounded-lg " style={{boxShadow: "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px   "}}
                         >
                             <div className="event_img">
                                 <img
-                                    className="w-full h-auto object-cover rounded-t-lg"
+                                    className="w-full h-auto object-cover cursor-pointer rounded-t-lg"
                                     onClick={() => handletap(ele._id)}
                                     src={ele.images[0]}
                                     alt=""
@@ -105,13 +105,13 @@ const HomeEvent = () => {
                                         </div>
                                         <div
                                             tabIndex={0}
-                                            className="card compact dropdown-content bg-base-100 rounded-box z-[10] w-30 shadow"
+                                            className="card compact dropdown-content bg-base-100 rounded-box z-[10] w-52 shadow-xl"
                                         >
                                             <div tabIndex={0} className="card-body">
-                                                <button onClick={() => handleDelPopup(ele._id)}>
+                                                <button className='bg-[#FE724C]' onClick={() => handleDelPopup(ele._id)}>
                                                     <i className="fa-solid fa-trash"></i> Delete
                                                 </button>
-                                                <button onClick={() => handleEditPopup(i, ele._id,ele)}>
+                                                <button className='bg-gray-300' onClick={() => handleEditPopup(i, ele._id,ele)}>
                                                     <i className="fa-solid fa-pen"></i> Change Status
                                                 </button>
                                             </div>
@@ -130,11 +130,14 @@ const HomeEvent = () => {
                                     ></div>
                                 </h3>
                             </div>
+                            
                         </div>
                     )) : (
                         <div className="text-center col-span-full">Add Something</div>
                     )}
+                    
                 </div>
+                <br /><br /><br /><br /><br />
                 <div className="fixed bottom-0 w-10/12 ms-auto left-0 right-0 bg-white shadow-sm py-3">
                     <div className="flex justify-center md:justify-end w-full md:w-10/12 mx-auto">
                         <div className="w-full md:w-1/2">
@@ -157,8 +160,8 @@ const HomeEvent = () => {
           >
               <h3>{isDel?"Are You Sure You Want To Delete ?":""}</h3>
               <div className='flex w-full mt-7'>
-              <button onClick={()=>{handleDel(isDel);setIsDel(null)}} className="bg-[#FE724C] w-full mx-3">Delete</button>
-              <button onClick={() => setIsDel(null)} className="bg-gray-300 w-full mx-3">Close</button>
+                <button onClick={()=>{handleDel(isDel);setIsDel(null)}} className="bg-[#FE724C] w-full mx-3">Delete</button>
+                <button onClick={() => setIsDel(null)} className="bg-gray-300 w-full mx-3">Close</button>
               </div>
               </Popup>:""
         }
