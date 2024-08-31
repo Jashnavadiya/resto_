@@ -138,8 +138,13 @@ const BasicInfoEvents = () => {
         setEvent({ ...event, [name]: value });
     }
 
+    const handleBack=()=>{
+        nav('../')
+    }
 
     const handleSubmit = async(e) => {
+
+
         if(editingEvent){
             let response=await axios.put(`http://localhost:5000/api/v1/event/update/${event._id}`,event)
         localStorage.setItem('event',JSON.stringify({...event,...response.data.data}))
@@ -352,8 +357,11 @@ const BasicInfoEvents = () => {
 
                     </div>
                 </div>
-                <button className='m-auto w-fit px-5 py-2 my-5' onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
+                <div className='w-fit m-auto'>
+                <button className='m-auto w-fit px-5 py-2 my-5 mx-5' onClick={handleBack} style={{ backgroundColor: "#FE724C", color: "white" }}>Back</button>
+                <button className='m-auto w-fit px-5 py-2 my-5 mx-5' onClick={handleSubmit} style={{ backgroundColor: "#FE724C", color: "white" }}>Next</button>
 
+                </div>
             </div>
         </>
     )

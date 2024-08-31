@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import './Homeevent.css'
+import Popup from '../../components/Popup';
 const HomeEvent = () => {
 
     const [events, setEvents] = useState([]);
-
+    const [isDel,setIsDel]=useState(null)
+    const [isEdit,setIsEdit]=useState(null)
     const nav = useNavigate()
     const handleNewEvent = () => {
         nav('../basicinfo')
@@ -30,7 +32,7 @@ const HomeEvent = () => {
         await axios.delete(`http://localhost:5000/api/v1/event/delete/${id}`)
     }
 
-    const handleStatus = async (index, id) => {
+    const handleStatus = async ({index,id,ele}) => {
         let [hi] = events.filter((ele) => ele._id === id);
         hi.status = !hi.status;
         console.log(hi);
@@ -47,12 +49,21 @@ const HomeEvent = () => {
         }
         )
     }
-    const handletap = (id) => {
+    const handletap = (id,tap) => {
         let [hi] = events.filter((ele) => ele._id === id);
         hi.status = !hi.status;
         localStorage.setItem('event', JSON.stringify(hi));
         nav('../basicinfo')
     }
+
+    const handleDelPopup=(id)=>{
+        setIsDel(id);
+    }
+    const handleEditPopup=(index,id,ele)=>{
+        setIsEdit({index:index,id:id,ele:ele});
+    }
+
+
     return (
         <>
             <div className="p-5">
@@ -97,10 +108,10 @@ const HomeEvent = () => {
                                             className="card compact dropdown-content bg-base-100 rounded-box z-[10] w-30 shadow"
                                         >
                                             <div tabIndex={0} className="card-body">
-                                                <button onClick={() => handleDel(ele._id)}>
+                                                <button onClick={() => handleDelPopup(ele._id)}>
                                                     <i className="fa-solid fa-trash"></i> Delete
                                                 </button>
-                                                <button onClick={() => handleStatus(i, ele._id)}>
+                                                <button onClick={() => handleEditPopup(i, ele._id,ele)}>
                                                     <i className="fa-solid fa-pen"></i> Change Status
                                                 </button>
                                             </div>
@@ -139,7 +150,32 @@ const HomeEvent = () => {
                     </div>
                 </div>
             </div>
-
+        {
+            isDel!==null?<Popup
+            title=""
+            onClose={() => setIsDel(null)}
+          >
+              <h3>{isDel?"Are You Sure You Want To Delete ?":""}</h3>
+              <div className='flex w-full mt-7'>
+              <button onClick={()=>{handleDel(isDel);setIsDel(null)}} className="bg-[#FE724C] w-full mx-3">Delete</button>
+              <button onClick={() => setIsDel(null)} className="bg-gray-300 w-full mx-3">Close</button>
+              </div>
+              </Popup>:""
+        }
+        {
+            isEdit!==null?<Popup
+            title=""
+            onClose={() => setIsEdit(null)}
+          >
+            {console.log(isEdit)}
+            
+              <h3>{isEdit?"Are You Sure You Want To Edit Status?" :""}</h3>
+              <div className='flex w-full mt-7'>
+              <button onClick={()=>{handleStatus(isEdit);setIsEdit(null)}} className={`${!isEdit.ele.status?"bg-[#FE724C]":"bg-gray-300"} w-full mx-3`}>{!isEdit.ele.status?"Make It Live!":"Yes,Pause Event"}</button>
+              <button onClick={() => setIsEdit(null)} className="bg-gray-300 w-full mx-3">Close</button>
+              </div>
+              </Popup>:""
+        }
         </>
     )
 }
